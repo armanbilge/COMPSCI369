@@ -81,13 +81,13 @@ public final class PGMIO {
     public static void write(final byte[][] image, final File file) throws IOException {
         try (final BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file))) {
             stream.write(MAGIC.getBytes());
-            stream.write(" ".getBytes());
-            stream.write(Integer.toString(image.length).getBytes());
-            stream.write(" ".getBytes());
+            stream.write("\n".getBytes());
             stream.write(Integer.toString(image[0].length).getBytes());
             stream.write(" ".getBytes());
+            stream.write(Integer.toString(image.length).getBytes());
+            stream.write("\n".getBytes());
             stream.write("255".getBytes());
-            stream.write(" ".getBytes());
+            stream.write("\n".getBytes());
             for (int i = 0; i < image.length; ++i) {
                 for (int j = 0; j < image[0].length; ++j) {
                     stream.write(image[i][j]);
