@@ -51,8 +51,8 @@ public final class PGMIO {
 
     /**
      * Reads a grayscale image from a file in PGM format.
-     * @param file The PGM file read from.
-     * @return Two-dimensional byte array representation of the image.
+     * @param file the PGM file read from
+     * @return two-dimensional byte array representation of the image
      * @throws IOException
      */
     public static byte[][] read(final File file) throws IOException {
@@ -79,8 +79,8 @@ public final class PGMIO {
 
     /**
      * Finds the next whitespace-delimited string in a stream.
-     * @param stream The stream read from.
-     * @return The next whitespace-delimited string.
+     * @param stream the stream read from
+     * @return the next whitespace-delimited string
      * @throws IOException
      */
     private static String next(final InputStream stream) throws IOException {
@@ -100,8 +100,8 @@ public final class PGMIO {
 
     /**
      * Writes a grayscale image to a file in PGM format.
-     * @param image Two-dimensional byte array representation of the image.
-     * @param file The file to write to.
+     * @param image a two-dimensional byte array representation of the image
+     * @param file the file to write to
      * @throws IOException
      */
     public static void write(final byte[][] image, final File file) throws IOException {

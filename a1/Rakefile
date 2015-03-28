@@ -2,8 +2,16 @@ require 'open-uri'
 
 directory 'lib'
 
-file 'Jama.jar' => 'lib' do |t|
-  open("lib/#{t.name}", 'wb') do |f|
+file 'lib/Jama.jar' => 'lib' do |t|
+  open(t.name, 'wb') do |f|
     f << open('http://math.nist.gov/javanumerics/jama/Jama-1.0.3.jar').read
   end
+end
+
+directory 'build' => 'src' do |t|
+  sh "javac -cp lib/Jama.jar -d #{t.name}
+rule '.class' =>
+    -> (c) { [c.sub(/\.class$/, '.java').sub(/^build\//, 'src/'),
+           'build', 'lib/Jama.jar'] } do |t|
+  sh "javac -cp lib/Jama.jar -d build #{t.source}"
 end
