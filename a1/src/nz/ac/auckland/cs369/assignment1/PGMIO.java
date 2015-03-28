@@ -35,14 +35,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * A simple class for reading and writing PGM images.
+ *
  * @author Arman Bilge
  */
 public final class PGMIO {
 
+    /**
+     * Magic number representing the binary PGM file type.
+     */
     private static final String MAGIC = "P5";
 
     private PGMIO() {}
 
+    /**
+     * Reads a grayscale image from a file in PGM format.
+     * @param file The PGM file read from.
+     * @return Two-dimensional byte array representation of the image.
+     * @throws IOException
+     */
     public static byte[][] read(final File file) throws IOException {
         try (final BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             if (!next(stream).equals(MAGIC))
@@ -56,7 +68,7 @@ public final class PGMIO {
             for (int i = 0; i < row; ++i) {
                 for (int j = 0; j < col; ++j) {
                     final int p = stream.read();
-                    if (p >= max)
+                    if (p > max)
                         throw new IOException("Pixel value " + p + " greater than specified max " + max + ".");
                     image[i][j] = (byte) p;
                 }
@@ -65,8 +77,14 @@ public final class PGMIO {
         }
     }
 
+    /**
+     * Finds the next whitespace-delimited string in a stream.
+     * @param stream The stream read from.
+     * @return The next whitespace-delimited string.
+     * @throws IOException
+     */
     private static String next(final InputStream stream) throws IOException {
-        final List<Byte> bytes = new ArrayList<Byte>();
+        final List<Byte> bytes = new ArrayList<>();
         int b;
         do {
             b = stream.read();
@@ -78,6 +96,12 @@ public final class PGMIO {
         return new String(bytesArray);
     }
 
+    /**
+     * Writes a grayscale image to a file in PGM format.
+     * @param image Two-dimensional byte array representation of the image.
+     * @param file The file to write to.
+     * @throws IOException
+     */
     public static void write(final byte[][] image, final File file) throws IOException {
         try (final BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file))) {
             stream.write(MAGIC.getBytes());
