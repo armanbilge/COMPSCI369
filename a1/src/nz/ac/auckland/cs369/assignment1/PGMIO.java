@@ -85,11 +85,13 @@ public final class PGMIO {
      */
     private static String next(final InputStream stream) throws IOException {
         final List<Byte> bytes = new ArrayList<>();
-        int b;
-        do {
-            b = stream.read();
-            if (!Character.isWhitespace((char) b)) bytes.add((byte) b);
-        } while (b != -1 && !Character.isWhitespace((char) b));
+        while (true) {
+            final int b = stream.read();
+            if (b != -1 && !Character.isWhitespace((char) b))
+                bytes.add((byte) b);
+            else
+                break;
+        }
         final byte[] bytesArray = new byte[bytes.size()];
         for (int i = 0; i < bytesArray.length; ++i)
             bytesArray[i] = bytes.get(i);
