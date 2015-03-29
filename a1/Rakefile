@@ -14,8 +14,10 @@ file 'lib/jblas.jar' => 'lib' do |t|
   end
 end
 
+task :depends => ['lib/Jama.jar', 'lib/jblas.jar']
+
 directory 'build'
 
-task :compile => 'build' do
+task :compile => ['build', :depends] do
   sh "javac -cp lib/Jama.jar -d build src/nz/ac/auckland/cs369/assignment1/*.java"
 end

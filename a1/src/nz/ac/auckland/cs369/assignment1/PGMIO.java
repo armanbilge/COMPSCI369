@@ -36,8 +36,7 @@ import java.util.List;
 
 /**
  *
- * A utility class for reading and writing PGM images. Methods use two-dimensional
- * integer arrays to represent unsigned bytes.
+ * A utility class for reading and writing PGM images. Methods integers to represent unsigned bytes.
  *
  * Generally I follow best practice and avoid reimplementing existing functionality.
  * However, I was disappointed by the provided class {@code PGM_PPM_Handler}.
@@ -77,8 +76,8 @@ public final class PGMIO {
             for (int i = 0; i < row; ++i) {
                 for (int j = 0; j < col; ++j) {
                     final int p = stream.read();
-                    if (p > max)
-                        throw new IOException("Pixel value " + p + " greater than specified max " + max + ".");
+                    if (p < 0 || p > max)
+                        throw new IOException("Pixel value " + p + " outside of range [0, " + max + "].");
                     image[i][j] = p;
                 }
             }
@@ -125,6 +124,9 @@ public final class PGMIO {
             stream.write("\n".getBytes());
             for (int i = 0; i < image.length; ++i) {
                 for (int j = 0; j < image[0].length; ++j) {
+                    final int p = image[i][j];
+                    if (p < 0 || p > 255)
+                        throw new IOException("Pixel value " + p + " outside of range [0, 255].");
                     stream.write(image[i][j]);
                 }
             }
