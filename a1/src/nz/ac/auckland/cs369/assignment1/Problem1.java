@@ -32,6 +32,7 @@ import java.io.IOException;
 
 /**
  * Code for problem 1.
+ *
  * @author Arman Bilge
  */
 public final class Problem1 {
@@ -80,7 +81,7 @@ public final class Problem1 {
      */
     public static void main(final String... args) throws IOException {
 
-        final byte[][] image = PGMIO.read(new File(args[0]));
+        final int[][] image = PGMIO.read(new File(args[0]));
 
         final Matrix A = new Matrix(ImageMatrixUtils.byteToDouble(image));
         final SingularValueDecomposition SVD = A.svd();
@@ -89,21 +90,21 @@ public final class Problem1 {
         svdDir.mkdir();
 
         final Matrix U = SVD.getU();
-        final byte[][] imageU = ImageMatrixUtils.doubleToByte(U.getArray(),
+        final int[][] imageU = ImageMatrixUtils.doubleToByte(U.getArray(),
                 new ImageMatrixUtils.LinearMap(ImageMatrixUtils.min(U.getArray()), ImageMatrixUtils.max(U.getArray())));
         PGMIO.write(imageU, new File(svdDir, "U.pgm"));
 
         final Matrix S = SVD.getS();
-        final byte[][] imageS = ImageMatrixUtils.doubleToByte(S.getArray(),
+        final int[][] imageS = ImageMatrixUtils.doubleToByte(S.getArray(),
                 new ImageMatrixUtils.LinearMap(ImageMatrixUtils.min(S.getArray()), ImageMatrixUtils.max(S.getArray())));
         PGMIO.write(imageS, new File(svdDir, "S.pgm"));
 
         final Matrix V = SVD.getV();
-        final byte[][] imageV = ImageMatrixUtils.doubleToByte(V.getArray(),
+        final int[][] imageV = ImageMatrixUtils.doubleToByte(V.getArray(),
                 new ImageMatrixUtils.LinearMap(ImageMatrixUtils.min(V.getArray()), ImageMatrixUtils.max(V.getArray())));
         PGMIO.write(imageV, new File(svdDir, "V.pgm"));
 
-        final File aHatDir = new File("AHat");
+        final File aHatDir = new File("Ahat");
         aHatDir.mkdir();
 
         final int[] rhos = {1, 2, 3, 4, 5, 10, 20, 30, 40, 80};
@@ -115,14 +116,14 @@ public final class Problem1 {
 
         int c = 1;
         for (int rho : rhos) {
-            final Matrix AHat = computeAHat(SVD, rho);
+            final Matrix A_hat = computeAHat(SVD, rho);
 
-            final byte[][] imageAHat = ImageMatrixUtils.doubleToByte(AHat.getArray(), ImageMatrixUtils.TRUNCATING_MAP);
+            final int[][] imageAHat = ImageMatrixUtils.doubleToByte(A_hat.getArray(), ImageMatrixUtils.TRUNCATING_MAP);
             PGMIO.write(imageAHat, new File(aHatDir, rho + ".pgm"));
 
             table.setHeader(c, Integer.toString(rho));
-            table.setContent(1, c, Double.toString(ImageMatrixUtils.computeMaxError(A, AHat)));
-            table.setContent(2, c, Double.toString(ImageMatrixUtils.computeMaxError(A, AHat)));
+            table.setContent(1, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
+            table.setContent(2, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
             table.setContent(3, c, Double.toString(computeCompression(A, rho) * 100));
             ++c;
         }

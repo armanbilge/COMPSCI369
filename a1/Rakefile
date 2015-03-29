@@ -8,10 +8,14 @@ file 'lib/Jama.jar' => 'lib' do |t|
   end
 end
 
-directory 'build' => 'src' do |t|
-  sh "javac -cp lib/Jama.jar -d #{t.name}
-rule '.class' =>
-    -> (c) { [c.sub(/\.class$/, '.java').sub(/^build\//, 'src/'),
-           'build', 'lib/Jama.jar'] } do |t|
-  sh "javac -cp lib/Jama.jar -d build #{t.source}"
+file 'lib/jblas.jar' => 'lib' do |t|
+  open(t.name, 'wb') do |f|
+    f << open('http://central.maven.org/maven2/org/jblas/jblas/1.2.3/jblas-1.2.3.jar').read
+  end
+end
+
+directory 'build'
+
+task :compile => 'build' do
+  sh "javac -cp lib/Jama.jar -d build src/nz/ac/auckland/cs369/assignment1/*.java"
 end

@@ -27,9 +27,11 @@ package nz.ac.auckland.cs369.assignment1;
 import Jama.Matrix;
 
 import java.util.Arrays;
+import java.util.function.DoubleToIntFunction;
 
 /**
  * A collection of utility functions for manipulating matrices that represent images.
+ *
  * @author Arman Bilge
  */
 public final class ImageMatrixUtils {
@@ -39,12 +41,12 @@ public final class ImageMatrixUtils {
     /**
      * Maps doubles to bytes by truncating values outside the byte range.
      */
-    public static final DoubleToByteFunction TRUNCATING_MAP = (d) -> {
+    public static final DoubleToIntFunction TRUNCATING_MAP = (d) -> {
         final int i = (int) Math.round(d);
-        if (i < Byte.MIN_VALUE)
-            return Byte.MIN_VALUE;
-        else if (i > Byte.MAX_VALUE)
-            return Byte.MAX_VALUE;
+        if (i < 0)
+            return 0;
+        else if (i > 255)
+            return 255;
         else
             return (byte) i;
     };
@@ -52,7 +54,7 @@ public final class ImageMatrixUtils {
     /**
      * Represents a linear map from a given range to the byte range.
      */
-    public static class LinearMap implements DoubleToByteFunction {
+    public static class LinearMap implements DoubleToIntFunction {
         final double min;
         final double max;
         public LinearMap(final double min, final double max) {
@@ -60,8 +62,8 @@ public final class ImageMatrixUtils {
             this.max = max;
         }
         @Override
-        public byte applyAsByte(final double d) {
-            return (byte) Math.round((Byte.MAX_VALUE - Byte.MIN_VALUE) * (d - min) / (max - min) + Byte.MIN_VALUE);
+        public int applyAsInt(final double d) {
+            return (int) Math.round(255 * (d - min) / (max - min));
         }
     }
 
@@ -70,7 +72,7 @@ public final class ImageMatrixUtils {
      * @param b a 2D byte array
      * @return a 2D double array
      */
-    public static double[][] byteToDouble(byte[][] b) {
+    public static double[][] byteToDouble(int[][] b) {
         final double[][] d = new double[b.length][b[0].length];
         for (int i = 0; i < d.length; ++i) {
             for (int j = 0; j < d[0].length; ++j) {
@@ -86,11 +88,11 @@ public final class ImageMatrixUtils {
      * @param f a mapping function
      * @return a 2D byte array
      */
-    public static byte[][] doubleToByte(double[][] d, DoubleToByteFunction f) {
-        final byte[][] b = new byte[d.length][d[0].length];
+    public static int[][] doubleToByte(double[][] d, DoubleToIntFunction f) {
+        final int[][] b = new int[d.length][d[0].length];
         for (int i = 0; i < b.length; ++i) {
             for (int j = 0; j < b[0].length; ++j) {
-                b[i][j] = f.applyAsByte(d[i][j]);
+                b[i][j] = f.applyAsInt(d[i][j]);
             }
         }
         return b;

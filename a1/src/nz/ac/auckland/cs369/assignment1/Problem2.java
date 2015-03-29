@@ -26,28 +26,92 @@ package nz.ac.auckland.cs369.assignment1;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+import nz.ac.auckland.cs369.assignment1.ImageMatrixUtils.LinearMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 
 /**
  * Code for problem 2.
+ *
  * @author Arman Bilge
  */
 public class Problem2 {
 
+    /**
+     * Computes the pseudoinverse of a matrix.
+     * @param A the matrix to invert
+     * @return the pseudoinverse of A
+     */
+    private static Matrix computePseudoInverse(final Matrix A) {
+        final SingularValueDecomposition SVD = A.svd();
+        final Matrix U = SVD.getU();
+        final Matrix D = SVD.getS();
+        final Matrix D_plus = computePseudoInverseDiagonal(D);
+        final Matrix V = SVD.getV();
+        return V.times(D_plus).times(U.transpose());
+    }
+
+    /**
+     * Computes the pseudoinverse of a diagonal matrix.
+     * @param D the diagonal matrix to invert
+     * @return the pseudoinverse of D
+     */
+    private static Matrix computePseudoInverseDiagonal(final Matrix D) {
+        final Matrix D_plus = D.copy();
+        for (int i = 0; i < D_plus.getRowDimension(); ++i) {
+            final double d_i = D.get(i, i);
+            D_plus.set(i, i, d_i != 0 ? 1 / d_i : 0);
+        }
+        return D_plus;
+    }
+
+    /**
+     * Computes the mean of the values in a matrix.
+     * @param A the matrix
+     * @return the mean of the matrix elements
+     */
+    private static double mean(final Matrix A) {
+        return Arrays.stream(A.getArray()).flatMapToDouble(Arrays::stream).sum() /
+                (A.getRowDimension() * A.getColumnDimension());
+    }
+
+    private static double stdev(final Matrix A) {
+        final double Ex2 = Arrays.stream(A.getArray()).flatMapToDouble(Arrays::stream).map(x -> x*x).sum() /
+                (A.getRowDimension() * A.getColumnDimension());
+        final double Ex = mean(A);
+        return Math.sqrt(Ex2 - Ex * Ex);
+    }
+
     public static void main(final String... args) throws IOException {
 
-        final byte[][] image = PGMIO.read(new File(args[0]));
+        final int[][] image = PGMIO.read(new File(args[0]));
 
         final Matrix A = new Matrix(ImageMatrixUtils.byteToDouble(image));
-        final SingularValueDecomposition SVD = A.svd();
+        final Matrix P_inv = computePseudoInverse(A);
+        final Matrix I_hat = P_inv.times(A);
 
         final File inverseDir = new File("inverse");
         inverseDir.mkdir();
 
+        final int[][] imagePinv = ImageMatrixUtils.doubleToByte(P_inv.getArray(),
+                new LinearMap(ImageMatrixUtils.min(P_inv.getArray()), ImageMatrixUtils.max(P_inv.getArray())));
+        PGMIO.write(imagePinv, new File(inverseDir, "Pinv.pgm"));
 
+        final int[][] imageIhat = ImageMatrixUtils.doubleToByte(I_hat.getArray(),
+                new LinearMap(ImageMatrixUtils.min(I_hat.getArray()), ImageMatrixUtils.max(I_hat.getArray())));
+        PGMIO.write(imageIhat, new File(inverseDir, "Ihat.pgm"));
 
+        final Matrix I = Matrix.identity(I_hat.getRowDimension(), I_hat.getColumnDimension());
+        final Matrix E = I.minus(I_hat);
+        final PrintWriter pw = new PrintWriter(new File(inverseDir, "error.yaml"));
+        pw.println("range: " + (ImageMatrixUtils.max(E.getArray()) - ImageMatrixUtils.min(E.getArray())));
+        final double mean = mean(E);
+        pw.println("mean: " + mean);
+        final double stdev = stdev(E);
+        pw.println("stdev: " + stdev);
     }
 
 }

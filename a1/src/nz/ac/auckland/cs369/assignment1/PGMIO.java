@@ -36,7 +36,16 @@ import java.util.List;
 
 /**
  *
- * A simple class for reading and writing PGM images.
+ * A utility class for reading and writing PGM images. Methods use two-dimensional
+ * integer arrays to represent unsigned bytes.
+ *
+ * Generally I follow best practice and avoid reimplementing existing functionality.
+ * However, I was disappointed by the provided class {@code PGM_PPM_Handler}.
+ * Because it was ported to Java from C code, it followed several un-Java-like practices,
+ * such as providing array dimensions via (emulated) pointers and returning error codes
+ * and writing to System.out instead of throwing exceptions.
+ *
+ * My reimplementation is intended to be simpler and more Java-friendly.
  *
  * @author Arman Bilge
  */
@@ -55,7 +64,7 @@ public final class PGMIO {
      * @return two-dimensional byte array representation of the image
      * @throws IOException
      */
-    public static byte[][] read(final File file) throws IOException {
+    public static int[][] read(final File file) throws IOException {
         try (final BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             if (!next(stream).equals(MAGIC))
                 throw new IOException("File " + file + " is not a binary PGM image.");
@@ -64,13 +73,13 @@ public final class PGMIO {
             final int max = Integer.parseInt(next(stream));
             if (max > 255)
                 throw new IOException("Images with greater than 256 shades of gray are not supported.");
-            final byte[][] image = new byte[row][col];
+            final int[][] image = new int[row][col];
             for (int i = 0; i < row; ++i) {
                 for (int j = 0; j < col; ++j) {
                     final int p = stream.read();
                     if (p > max)
                         throw new IOException("Pixel value " + p + " greater than specified max " + max + ".");
-                    image[i][j] = (byte) p;
+                    image[i][j] = p;
                 }
             }
             return image;
@@ -104,7 +113,7 @@ public final class PGMIO {
      * @param file the file to write to
      * @throws IOException
      */
-    public static void write(final byte[][] image, final File file) throws IOException {
+    public static void write(final int[][] image, final File file) throws IOException {
         try (final BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file))) {
             stream.write(MAGIC.getBytes());
             stream.write("\n".getBytes());
