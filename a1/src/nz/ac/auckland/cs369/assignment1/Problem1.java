@@ -107,7 +107,7 @@ public final class Problem1 {
         final File aHatDir = new File("Ahat");
         aHatDir.mkdir();
 
-        final int[] rhos = {1, 2, 3, 4, 5, 10, 20, 30, 40, 80};
+        final int[] rhos = {1, 2, 3, 4, 5, 10, 20, 30, 40, 90};
         final Table table = new Table(4, rhos.length + 1);
         table.setHeader(0, "$\\rho$");
         table.setContent(1, 0, "Max error");
