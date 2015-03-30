@@ -19,5 +19,13 @@ task :depends => ['lib/Jama.jar', 'lib/jblas.jar']
 directory 'build'
 
 task :compile => ['build', :depends] do
-  sh "javac -cp lib/Jama.jar -d build src/nz/ac/auckland/cs369/assignment1/*.java"
+  sh 'javac -cp "lib/*" -d build src/nz/ac/auckland/cs369/assignment1/*.java'
+end
+
+directory 'out'
+
+task :problem1 => ['out', :compile] do
+  Dir.chdir('out') do
+    sh 'java -cp "../build:../lib/*" nz.ac.auckland.cs369.assignment1.Problem1 ../data/arman.pgm'
+  end
 end
