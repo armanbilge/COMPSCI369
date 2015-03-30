@@ -48,7 +48,7 @@ public final class ImageMatrixUtils {
         else if (i > 255)
             return 255;
         else
-            return (byte) i;
+            return i;
     };
 
     /**
