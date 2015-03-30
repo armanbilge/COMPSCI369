@@ -24,6 +24,9 @@
 
 package nz.ac.auckland.cs369.assignment1;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
@@ -34,7 +37,14 @@ import java.util.Arrays;
 public class Table {
 
     public enum Alignment {
-        LEFT, RIGHT, CENTER
+        LEFT("l"), RIGHT("r"), CENTER("c");
+        private final String latexCode;
+        Alignment(final String latexCode) {
+            this.latexCode = latexCode;
+        }
+        public String toString() {
+            return latexCode;
+        }
     }
 
     private final Alignment[] alignment;
@@ -81,6 +91,17 @@ public class Table {
         this.content[row][col] = content;
     }
 
-    // TODO Implement method for LaTeX and/or Markdown output
+    /**
+     * Write the table as a LaTeX tabular environment.
+     * @param file the stream to write to
+     * @throws IOException
+     */
+    public void write(final File file) throws IOException {
+        try (final PrintWriter pw = new PrintWriter(file)) {
+            pw.print("\\begin{tabular}{" + String.join(" ", (Iterable<String>) Arrays.stream(alignment).map(Alignment::toString)::iterator));
+
+            pw.println("\\end{tabular}");
+        }
+    }
 
 }

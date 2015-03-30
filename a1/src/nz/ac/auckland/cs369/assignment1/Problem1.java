@@ -110,9 +110,10 @@ public final class Problem1 {
         final int[] rhos = {1, 2, 3, 4, 5, 10, 20, 30, 40, 90};
         final Table table = new Table(4, rhos.length + 1);
         table.setHeader(0, "$\\rho$");
-        table.setContent(1, 0, "Max error");
-        table.setContent(2, 0, "Mean error");
-        table.setContent(3, 0, "% Compression");
+        int r = 1;
+        table.setContent(r++, 0, "Max error");
+        table.setContent(r++, 0, "Mean error");
+        table.setContent(r++, 0, "% Compression");
 
         int c = 1;
         for (int rho : rhos) {
@@ -122,9 +123,10 @@ public final class Problem1 {
             PGMIO.write(imageAHat, new File(aHatDir, rho + ".pgm"));
 
             table.setHeader(c, Integer.toString(rho));
-            table.setContent(1, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
-            table.setContent(2, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
-            table.setContent(3, c, Double.toString(computeCompression(A, rho) * 100));
+            r = 1;
+            table.setContent(r++, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
+            table.setContent(r++, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
+            table.setContent(r++, c, Double.toString(computeCompression(A, rho) * 100));
             ++c;
         }
 

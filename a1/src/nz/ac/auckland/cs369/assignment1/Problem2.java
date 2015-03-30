@@ -29,8 +29,8 @@ import Jama.SingularValueDecomposition;
 import nz.ac.auckland.cs369.assignment1.ImageMatrixUtils.LinearMap;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
@@ -78,6 +78,11 @@ public class Problem2 {
                 (A.getRowDimension() * A.getColumnDimension());
     }
 
+    /**
+     * Computes the standard deviation of the values in a matrix.
+     * @param A the matrix
+     * @return the standard deviation of the matrix elements
+     */
     private static double stdev(final Matrix A) {
         final double Ex2 = Arrays.stream(A.getArray()).flatMapToDouble(Arrays::stream).map(x -> x*x).sum() /
                 (A.getRowDimension() * A.getColumnDimension());
@@ -106,12 +111,13 @@ public class Problem2 {
 
         final Matrix I = Matrix.identity(I_hat.getRowDimension(), I_hat.getColumnDimension());
         final Matrix E = I.minus(I_hat);
-        final PrintWriter pw = new PrintWriter(new File(inverseDir, "error.yaml"));
-        pw.println("range: " + (ImageMatrixUtils.max(E.getArray()) - ImageMatrixUtils.min(E.getArray())));
-        final double mean = mean(E);
-        pw.println("mean: " + mean);
-        final double stdev = stdev(E);
-        pw.println("stdev: " + stdev);
+
+        final Variables var = new Variables();
+        var.put("range", (ImageMatrixUtils.max(E.getArray()) - ImageMatrixUtils.min(E.getArray())));
+        var.put("mean", mean(E));
+        var.put("stdev", stdev(E));
+        var.write(new FileOutputStream(new File(inverseDir, "error.tex")));
+
     }
 
 }

@@ -24,6 +24,9 @@
 
 package nz.ac.auckland.cs369.assignment1;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -92,23 +95,25 @@ public class Problem4 {
                                      final DoubleUnaryOperator dfdx,
                                      final String name) {
         final Table table = new Table(x.size() - 1, 5);
-        table.setHeader(0, "Step $i$");
-        table.setHeader(1, "$x_i$");
-        table.setHeader(2, "$" + name + "(x_i)$");
-        table.setHeader(3, "$\\frac{d" + name + "(x)}{dx}\\big|_{x = x_i}");
-        table.setHeader(4, "$x_{i+1}$");
+        int c = 0;
+        table.setHeader(c++, "Step $i$");
+        table.setHeader(c++, "$x_i$");
+        table.setHeader(c++, "$" + name + "\\left(x_i\\right)$");
+        table.setHeader(c++, "$\\frac{d" + name + "\\left(x\\right)}{dx}\\big|_{x = x_i}");
+        table.setHeader(c++, "$x_{i+1}$");
         for (int i = 0; i < x.size() - 1; ++i) {
-            table.setContent(i, 0, Integer.toString(i));
+            c = 0;
+            table.setContent(i, c++, Integer.toString(i));
             final double x_i = x.get(i);
-            table.setContent(i, 1, nf.format(x.get(i)));
-            table.setContent(i, 2, nf.format(f.applyAsDouble(x_i)));
-            table.setContent(i, 3, nf.format(dfdx.applyAsDouble(x_i)));
-            table.setContent(i, 4, nf.format(x.get(i+1)));
+            table.setContent(i, c++, nf.format(x.get(i)));
+            table.setContent(i, c++, nf.format(f.applyAsDouble(x_i)));
+            table.setContent(i, c++, nf.format(dfdx.applyAsDouble(x_i)));
+            table.setContent(i, c++, nf.format(x.get(i+1)));
         }
         return table;
     }
 
-    public static void main(final String... args) {
+    public static void main(final String... args) throws IOException {
 
         final DoubleUnaryOperator f = x -> 2 * x * x * x - 15 * x * x + 36 * x - 23;
         final DoubleUnaryOperator dfdx = x -> 6 * x * x - 30 * x + 36;
@@ -122,7 +127,11 @@ public class Problem4 {
         newtonsMethod(0, g, dgdx, gxs);
         final Table tableG = createTable(gxs, g, dgdx, "g");
 
-        // TODO Write out tables
+        final File newtonDir = new File("newton");
+        newtonDir.mkdir();
+        tableF.write(new FileOutputStream(new File(newtonDir, "f.tex")));
+        tableG.write(new FileOutputStream(new File(newtonDir, "g.tex")));
+
     }
 
 }
