@@ -25,9 +25,7 @@
 package nz.ac.auckland.cs369.assignment1;
 
 import Jama.Matrix;
-import org.jblas.DoubleMatrix;
-import org.jblas.Eigen;
-
+import Jama.SingularValueDecomposition;
 import java.util.Arrays;
 
 /**
@@ -38,20 +36,18 @@ import java.util.Arrays;
 public class PrincipalComponentsAnalysis {
 
     private final Matrix A;
-    private final Matrix D;
-    private final Matrix V;
+    private final Matrix U;
 
     /**
      * Constructs a principal components analysis for the given matrix.
+     * Assumes that rows of the matrix independent samples and that columns represent variables.
      * @param A the matrix
      */
     public PrincipalComponentsAnalysis(final Matrix A) {
         this.A = A;
         final Matrix B = centerRows(A);
-        final Matrix Sigma = computeCovarianceMatrix(B);
-        final DoubleMatrix[] VD = Eigen.symmetricEigenvectors(new DoubleMatrix(Sigma.getArray()));
-        D = new Matrix(VD[1].toArray2());
-        V = new Matrix(VD[0].toArray2());
+        final SingularValueDecomposition SVD = B.svd();
+        U = SVD.getU().times(SVD.getS());
     }
 
     /**
@@ -80,17 +76,12 @@ public class PrincipalComponentsAnalysis {
         return A.timesEquals(1.0 / (A.getColumnDimension() - 1)).times(A.transpose());
     }
 
-    public double getSingularValue(final int i) {
-        return D.get(D.getRowDimension() - i, D.getColumnDimension() - i);
-    }
-
     public Matrix getPrincipalComponentVector(final int i) {
-        return V.getMatrix(0, V.getRowDimension() - 1, V.getColumnDimension() - i, V.getColumnDimension() - i);
+        return U.getMatrix(0, U.getRowDimension() - 1, i, i);
     }
 
     public Matrix getProjectionMatrix(final int k) {
-        final Matrix U_k = V.getMatrix(0, V.getRowDimension() - 1,
-                V.getColumnDimension() - k, V.getColumnDimension() - 1);
+        final Matrix U_k = U.getMatrix(0, U.getRowDimension() - 1, 0, k);
         return U_k.times(U_k.transpose());
     }
 

@@ -29,7 +29,6 @@ import Jama.SingularValueDecomposition;
 import nz.ac.auckland.cs369.assignment1.ImageMatrixUtils.LinearMap;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -116,7 +115,7 @@ public class Problem2 {
         var.put("range", (ImageMatrixUtils.max(E.getArray()) - ImageMatrixUtils.min(E.getArray())));
         var.put("mean", mean(E));
         var.put("stdev", stdev(E));
-        var.write(new FileOutputStream(new File(inverseDir, "error.tex")));
+        var.write(new File(inverseDir, "error.tex"));
 
     }
 
