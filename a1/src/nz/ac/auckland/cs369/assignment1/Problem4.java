@@ -25,7 +25,6 @@
 package nz.ac.auckland.cs369.assignment1;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -129,8 +128,8 @@ public class Problem4 {
 
         final File newtonDir = new File("newton");
         newtonDir.mkdir();
-        tableF.write(new FileOutputStream(new File(newtonDir, "f.tex")));
-        tableG.write(new FileOutputStream(new File(newtonDir, "g.tex")));
+        tableF.write(new File(newtonDir, "f.tex"));
+        tableG.write(new File(newtonDir, "g.tex"));
 
     }
 

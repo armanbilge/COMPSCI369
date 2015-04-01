@@ -31,6 +31,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.function.DoubleFunction;
+import java.util.stream.IntStream;
 
 /**
  * Code for problem 3.
@@ -75,8 +77,27 @@ public class Problem3 {
         final File dataFile = new File(args[0]);
         final Matrix A = readMatrix(dataFile, Integer.parseInt(args[1]), Integer.parseInt(args[2])).transpose();
         final PrincipalComponentsAnalysis PCA = new PrincipalComponentsAnalysis(A);
-        final Matrix L = PCA.getProjectedData(2);
-        writeMatrix(L, new File("locations.txt"));
+
+        final File pcaDir = new File("PCA");
+        pcaDir.mkdir();
+
+        final Variables vars = new Variables();
+        vars.put("pc", "$" + String.join(",",
+                (Iterable<String>) IntStream.range(0, 5)
+                        .mapToDouble(PCA::getPrincipalComponent)
+                        .mapToObj(Double::toString)::iterator) + "$");
+        vars.put("pcv", "$" + String.join(",",
+                (Iterable<String>) IntStream.range(0, 5)
+                        .mapToObj(PCA::getPrincipalComponentVector)
+                        .map(v -> "\\left[" + String.join(",",
+                                (Iterable<String>) IntStream.range(0, 5)
+                                        .mapToDouble(i -> v.get(i, 0))
+                                        .mapToObj(Double::toString)::iterator) + "\\ldots\\right]")::iterator) + "$");
+        vars.write(new File(pcaDir, "values.tex"));
+
+//        final Matrix L = PCA.getProjectedData(2);
+//        writeMatrix(L, new File("locations.txt"));
+
     }
 
 }

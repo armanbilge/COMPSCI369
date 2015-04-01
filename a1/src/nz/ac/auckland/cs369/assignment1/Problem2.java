@@ -117,6 +117,11 @@ public class Problem2 {
         var.put("stdev", stdev(E));
         var.write(new File(inverseDir, "error.tex"));
 
+        final Matrix B = A.times(P_inv);
+        final int[][] imageB = ImageMatrixUtils.doubleToByte(B.getArray(),
+                new LinearMap(ImageMatrixUtils.min(B.getArray()), ImageMatrixUtils.max(B.getArray())));
+        PGMIO.write(imageB, new File(inverseDir, "B.pgm"));
+
     }
 
 }

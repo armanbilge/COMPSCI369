@@ -37,17 +37,21 @@ public class PrincipalComponentsAnalysis {
 
     private final Matrix A;
     private final Matrix U;
+    private final Matrix D;
 
     /**
      * Constructs a principal components analysis for the given matrix.
-     * Assumes that rows of the matrix independent samples and that columns represent variables.
+     * Assumes that columns of the matrix independent samples and that rows represent variables.
      * @param A the matrix
      */
     public PrincipalComponentsAnalysis(final Matrix A) {
         this.A = A;
         final Matrix B = centerRows(A);
         final SingularValueDecomposition SVD = B.svd();
-        U = SVD.getU().times(SVD.getS());
+        final Matrix S = SVD.getS();
+        final Matrix V = SVD.getV();
+        U = V.times(S);
+        D = S.arrayTimes(S).times(1.0 / (A.getColumnDimension() - 1));
     }
 
     /**
@@ -57,23 +61,37 @@ public class PrincipalComponentsAnalysis {
      */
     private Matrix centerRows(final Matrix A) {
         final Matrix B = A.copy();
+        final int rows = B.getRowDimension();
         final int cols = B.getColumnDimension();
-        for (int i = 0; i < B.getRowDimension(); ++i) {
+        for (int i = 0; i < rows; ++i) {
             final Matrix row = B.getMatrix(i, i, 0, cols - 1);
             final double[][] mean = new double[1][cols];
-            Arrays.fill(mean[0], row.normInf() / cols);
+            Arrays.fill(mean[0], Arrays.stream(row.getRowPackedCopy()).sum() / cols);
             row.minusEquals(new Matrix(mean));
         }
         return B;
     }
 
-    /**
-     * Computes the covariance matrix for a given matrix.
-     * @param A the matrix
-     * @return the covariance matrix of A
-     */
-    private Matrix computeCovarianceMatrix(final Matrix A) {
-        return A.timesEquals(1.0 / (A.getColumnDimension() - 1)).times(A.transpose());
+//    /**
+//     * Centers the columns of a matrix.
+//     * @param A the matrix
+//     * @return the centered matrix
+//     */
+//    private Matrix centerColumns(final Matrix A) {
+//        final Matrix B = A.copy();
+//        final int rows = B.getRowDimension();
+//        final int cols = B.getColumnDimension();
+//        for (int i = 0; i < B.getColumnDimension(); ++i) {
+//            final Matrix column = B.getMatrix(0, rows - 1, i, i);
+//            final double[][] mean = new double[rows][];
+//            Arrays.fill(mean, new double[]{Arrays.stream(column.getColumnPackedCopy()).sum() / rows});
+//            column.minusEquals(new Matrix(mean));
+//        }
+//        return B;
+//    }
+
+    public double getPrincipalComponent(final int i) {
+        return D.get(i, i);
     }
 
     public Matrix getPrincipalComponentVector(final int i) {
@@ -81,7 +99,7 @@ public class PrincipalComponentsAnalysis {
     }
 
     public Matrix getProjectionMatrix(final int k) {
-        final Matrix U_k = U.getMatrix(0, U.getRowDimension() - 1, 0, k);
+        final Matrix U_k = U.getMatrix(0, U.getRowDimension() - 1, 0, k - 1);
         return U_k.times(U_k.transpose());
     }
 
