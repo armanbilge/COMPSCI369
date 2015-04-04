@@ -24,6 +24,8 @@
 
 package nz.ac.auckland.cs369.assignment1;
 
+import nz.ac.auckland.cs369.assignment1.Table.Alignment;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -37,12 +39,14 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Arman Bilge
  */
-public class Problem4 {
+public final class Problem4 {
 
     private static final NumberFormat nf = DecimalFormat.getInstance();
     static {
         nf.setMaximumFractionDigits(5);
     }
+
+    private Problem4() {}
 
     /**
      * Uses Newton's method to find a root of a function.
@@ -70,10 +74,10 @@ public class Problem4 {
 
     /**
      * Computes an iteration of Newton's method.
-     * @param x_i
+     * @param x_i the current value of x
      * @param f the function
      * @param dfdx the derivative of the function with respect to x
-     * @return x_(i+1)
+     * @return the next value of x
      */
     private static double iterateNewtonsMethod(final double x_i,
                                                final DoubleUnaryOperator f,
@@ -98,16 +102,17 @@ public class Problem4 {
         table.setHeader(c++, "Step $i$");
         table.setHeader(c++, "$x_i$");
         table.setHeader(c++, "$" + name + "\\left(x_i\\right)$");
-        table.setHeader(c++, "$\\frac{d" + name + "\\left(x\\right)}{dx}\\big|_{x = x_i}");
+        table.setHeader(c++, "$\\frac{d" + name + "\\left(x\\right)}{dx}\\big|_{x = x_i}$");
+        for (int i = 0; i < 5; ++i) table.setAlignment(i, Alignment.RIGHT);
         table.setHeader(c++, "$x_{i+1}$");
         for (int i = 0; i < x.size() - 1; ++i) {
             c = 0;
             table.setContent(i, c++, Integer.toString(i));
             final double x_i = x.get(i);
-            table.setContent(i, c++, nf.format(x.get(i)));
-            table.setContent(i, c++, nf.format(f.applyAsDouble(x_i)));
-            table.setContent(i, c++, nf.format(dfdx.applyAsDouble(x_i)));
-            table.setContent(i, c++, nf.format(x.get(i+1)));
+            table.setContent(i, c++, "$" + nf.format(x.get(i)) + "$");
+            table.setContent(i, c++, "$" + nf.format(f.applyAsDouble(x_i)) + "$");
+            table.setContent(i, c++, "$" + nf.format(dfdx.applyAsDouble(x_i)) + "$");
+            table.setContent(i, c++, "$" + nf.format(x.get(i+1)) + "$");
         }
         return table;
     }

@@ -98,8 +98,13 @@ public class Table {
      */
     public void write(final File file) throws IOException {
         try (final PrintWriter pw = new PrintWriter(file)) {
-            pw.print("\\begin{tabular}{" + String.join(" ", (Iterable<String>) Arrays.stream(alignment).map(Alignment::toString)::iterator));
-
+            pw.println("\\begin{tabular}{"
+                    + String.join(" ", (Iterable<String>) Arrays.stream(alignment).map(Alignment::toString)::iterator)
+                    + "}");
+            pw.println(String.join(" & ", (Iterable<String>) Arrays.stream(header).map(h -> "\\textbf{" + h + "}")::iterator)+ " \\\\");
+            pw.println("\\hline");
+            for (final String[] row : content)
+                pw.println(String.join(" & ", Arrays.asList(row)) + " \\\\");
             pw.println("\\end{tabular}");
         }
     }

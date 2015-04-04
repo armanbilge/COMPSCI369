@@ -37,7 +37,9 @@ import java.util.Arrays;
  *
  * @author Arman Bilge
  */
-public class Problem2 {
+public final class Problem2 {
+
+    private Problem2() {}
 
     /**
      * Computes the pseudoinverse of a matrix.

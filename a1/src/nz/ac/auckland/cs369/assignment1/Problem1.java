@@ -26,9 +26,12 @@ package nz.ac.auckland.cs369.assignment1;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+import nz.ac.auckland.cs369.assignment1.Table.Alignment;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  * Code for problem 1.
@@ -36,6 +39,11 @@ import java.io.IOException;
  * @author Arman Bilge
  */
 public final class Problem1 {
+
+    private static final NumberFormat nf = DecimalFormat.getInstance();
+    static {
+        nf.setMaximumFractionDigits(2);
+    }
 
     private Problem1() {}
 
@@ -94,10 +102,10 @@ public final class Problem1 {
                 new ImageMatrixUtils.LinearMap(ImageMatrixUtils.min(U.getArray()), ImageMatrixUtils.max(U.getArray())));
         PGMIO.write(imageU, new File(svdDir, "U.pgm"));
 
-        final Matrix S = SVD.getS();
-        final int[][] imageS = ImageMatrixUtils.doubleToByte(S.getArray(),
-                new ImageMatrixUtils.LinearMap(ImageMatrixUtils.min(S.getArray()), ImageMatrixUtils.max(S.getArray())));
-        PGMIO.write(imageS, new File(svdDir, "S.pgm"));
+        final Matrix D = SVD.getS();
+        final int[][] imageD = ImageMatrixUtils.doubleToByte(D.getArray(),
+                new ImageMatrixUtils.LinearMap(ImageMatrixUtils.min(D.getArray()), ImageMatrixUtils.max(D.getArray())));
+        PGMIO.write(imageD, new File(svdDir, "D.pgm"));
 
         final Matrix V = SVD.getV();
         final int[][] imageV = ImageMatrixUtils.doubleToByte(V.getArray(),
@@ -110,27 +118,32 @@ public final class Problem1 {
         final int[] rhos = {1, 2, 3, 4, 5, 10, 20, 30, 40, 90};
         final Table table = new Table(4, rhos.length + 1);
         table.setHeader(0, "$\\rho$");
-        int r = 1;
-        table.setContent(r++, 0, "Max error");
-        table.setContent(r++, 0, "Mean error");
-        table.setContent(r++, 0, "% Compression");
+        table.setAlignment(0, Alignment.LEFT);
+        int r = 0;
+        table.setContent(r++, 0, "$\\widehat{\\mathbf{A}}_\\rho$");
+        table.setContent(r++, 0, "\\textbf{Max error}");
+        table.setContent(r++, 0, "\\textbf{Mean error}");
+        table.setContent(r++, 0, "\\textbf{\\% Compression}");
 
         int c = 1;
         for (int rho : rhos) {
             final Matrix A_hat = computeAHat(SVD, rho);
 
             final int[][] imageAHat = ImageMatrixUtils.doubleToByte(A_hat.getArray(), ImageMatrixUtils.TRUNCATING_MAP);
-            PGMIO.write(imageAHat, new File(aHatDir, rho + ".pgm"));
+            final File imageFile = new File(aHatDir, rho + ".pgm");
+            PGMIO.write(imageAHat, imageFile);
 
-            table.setHeader(c, Integer.toString(rho));
-            r = 1;
-            table.setContent(r++, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
-            table.setContent(r++, c, Double.toString(ImageMatrixUtils.computeMaxError(A, A_hat)));
-            table.setContent(r++, c, Double.toString(computeCompression(A, rho) * 100));
+            table.setHeader(c, "$" + (rho > 5 ? "\\ldots" : "") + Integer.toString(rho) + "$");
+            r = 0;
+            table.setContent(r++, c, "\\includegraphics{" + imageFile.getPath() + "}");
+            table.setContent(r++, c, "$" + nf.format(ImageMatrixUtils.computeMaxError(A, A_hat)) + "$");
+            table.setContent(r++, c, "$" + nf.format(ImageMatrixUtils.computeMeanError(A, A_hat)) + "$");
+            final double compression = computeCompression(A, rho);
+            table.setContent(r++, c, compression > 0 ? "$" + nf.format(compression * 100) + "$" : "n/a");
             ++c;
         }
 
-        // TODO Complete and write out table
+        table.write(new File(aHatDir, "compression.tex"));
 
     }
 

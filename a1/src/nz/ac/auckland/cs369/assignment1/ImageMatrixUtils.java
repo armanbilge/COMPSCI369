@@ -41,7 +41,7 @@ public final class ImageMatrixUtils {
     /**
      * Maps doubles to bytes by truncating values outside the byte range.
      */
-    public static final DoubleToIntFunction TRUNCATING_MAP = (d) -> {
+    public static final DoubleToIntFunction TRUNCATING_MAP = d -> {
         final int i = (int) Math.round(d);
         if (i < 0)
             return 0;

@@ -39,7 +39,9 @@ import java.util.stream.IntStream;
  *
  * @author Arman Bilge
  */
-public class Problem3 {
+public final class Problem3 {
+
+    private Problem3() {}
 
     /**
      * Reads a matrix from whitespace-delimited plain text file.
@@ -95,7 +97,7 @@ public class Problem3 {
                                         .mapToObj(Double::toString)::iterator) + "\\ldots\\right]")::iterator) + "$");
         vars.write(new File(pcaDir, "values.tex"));
 
-//        final Matrix L = PCA.getProjectedData(2);
+        final Matrix L = PCA.getProjectedData(2);
 //        writeMatrix(L, new File("locations.txt"));
 
     }
