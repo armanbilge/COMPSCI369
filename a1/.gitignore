@@ -1,5 +1,7 @@
 .idea/
 a1.iml
 build/
+doc/
 lib/
 out/
+*.png

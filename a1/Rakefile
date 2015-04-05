@@ -1,4 +1,8 @@
 require 'open-uri'
+require 'rake/clean'
+
+desc 'Run all code and generate PDF report'
+task :default => 'doc/report.pdf'
 
 directory 'lib'
 
@@ -8,18 +12,57 @@ file 'lib/Jama.jar' => 'lib' do |t|
   end
 end
 
+desc 'Get all dependencies'
 task :depends => ['lib/Jama.jar']
 
 directory 'build'
+CLEAN.include 'build'
 
-task :compile => ['build', :depends] do
+task :compile => [:depends, 'build'] do
   sh 'javac -cp "lib/*" -d build src/nz/ac/auckland/cs369/assignment1/*.java'
 end
 
 directory 'out'
+CLEAN.include 'out'
 
-task :problem1 => ['out', :compile] do
+desc 'Create problem 1 files'
+task :problem1 => [:compile, 'out'] do
   Dir.chdir('out') do
     sh 'java -cp "../build:../lib/*" nz.ac.auckland.cs369.assignment1.Problem1 ../data/arman.pgm'
   end
 end
+
+desc 'Create problem 2 files'
+task :problem2 => [:compile, 'out'] do
+  Dir.chdir('out') do
+    sh 'java -cp "../build:../lib/*" nz.ac.auckland.cs369.assignment1.Problem2 ../data/arman.pgm'
+  end
+end
+
+desc 'Create problem 3 files'
+task :problem3 => [:compile, 'out'] do
+  Dir.chdir('out') do
+    sh 'java -cp "../build:../lib/*" nz.ac.auckland.cs369.assignment1.Problem3 ../data/snps.txt 100 2734'
+  end
+end
+
+desc 'Create problem 4 files'
+task :problem4 => [:compile, 'out'] do
+  Dir.chdir('out') do
+    sh 'java -cp "../build:../lib/*" nz.ac.auckland.cs369.assignment1.Problem4'
+  end
+end
+
+rule '.png' => '.pgm' do |t|
+  sh "convert #{t.source} #{t.name}"
+end
+
+task :convert => FileList.new('**/*.pgm').ext('png')
+CLEAN.include '**/*.png'
+
+file 'doc/report.pdf' => [:problem1, :problem2, :problem4, :convert] do |t|
+  Dir.chdir('out') do
+    sh "pandoc -V geometry:margin=2cm ../README.md -o ../#{t.name}"
+  end
+end
+CLOBBER.include 'doc'

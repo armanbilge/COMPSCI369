@@ -130,12 +130,11 @@ public final class Problem1 {
             final Matrix A_hat = computeAHat(SVD, rho);
 
             final int[][] imageAHat = ImageMatrixUtils.doubleToByte(A_hat.getArray(), ImageMatrixUtils.TRUNCATING_MAP);
-            final File imageFile = new File(aHatDir, rho + ".pgm");
-            PGMIO.write(imageAHat, imageFile);
+            PGMIO.write(imageAHat, new File(aHatDir, rho + ".pgm"));
 
             table.setHeader(c, "$" + (rho > 5 ? "\\ldots" : "") + Integer.toString(rho) + "$");
             r = 0;
-            table.setContent(r++, c, "\\includegraphics{" + imageFile.getPath() + "}");
+            table.setContent(r++, c, "\\includegraphics[width=1cm]{" + new File(aHatDir, rho + ".png").getPath() + "}");
             table.setContent(r++, c, "$" + nf.format(ImageMatrixUtils.computeMaxError(A, A_hat)) + "$");
             table.setContent(r++, c, "$" + nf.format(ImageMatrixUtils.computeMeanError(A, A_hat)) + "$");
             final double compression = computeCompression(A, rho);
