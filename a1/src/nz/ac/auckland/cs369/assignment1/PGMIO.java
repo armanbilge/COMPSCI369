@@ -102,7 +102,7 @@ public final class PGMIO {
     }
 
     /**
-     * Finds the next whitespace-delimited string in a stream.
+     * Finds the next whitespace-delimited string in a stream, ignoring any comments.
      * @param stream the stream read from
      * @return the next whitespace-delimited string
      * @throws IOException

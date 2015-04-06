@@ -61,13 +61,14 @@ public final class Problem4 {
                                         final DoubleUnaryOperator dfdx,
                                         final List<Double> xs) {
         xs.add(x_0);
-        double x_i = x_0;
+        double x_im1 = x_0;
+        double x_i;
         while (true) {
-            final double x_ip1 = iterateNewtonsMethod(x_i, f, dfdx);
-            xs.add(x_ip1);
-            if (Math.abs(x_i - x_ip1) <= 0.0001)
+            x_i = iterateNewtonsMethod(x_im1, f, dfdx);
+            xs.add(x_i);
+            if (Math.abs(x_i - x_im1) <= 0.0001)
                 break;
-            x_i = x_ip1;
+            x_im1 = x_i;
         }
         return x_i;
     }
@@ -117,22 +118,32 @@ public final class Problem4 {
         return table;
     }
 
+    /**
+     * Creates all necessary files for problem 4.
+     * @param args No command line arguments
+     * @throws IOException
+     */
     public static void main(final String... args) throws IOException {
+
+        final Variables roots = new Variables();
 
         final DoubleUnaryOperator f = x -> 2 * x * x * x - 15 * x * x + 36 * x - 23;
         final DoubleUnaryOperator dfdx = x -> 6 * x * x - 30 * x + 36;
         final List<Double> fxs = new ArrayList<>();
-        newtonsMethod(0, f, dfdx, fxs);
+        final double rf = newtonsMethod(0, f, dfdx, fxs);
+        roots.put("rootf", nf.format(rf));
         final Table tableF = createTable(fxs, f, dfdx, "f");
 
         final DoubleUnaryOperator g = x -> Math.exp(0.1 * x) - Math.exp(-0.4 * x) - 1;
         final DoubleUnaryOperator dgdx = x -> 0.1 * Math.exp(0.1 * x) + 0.4 * Math.exp(-0.4 * x);
         final List<Double> gxs = new ArrayList<>();
-        newtonsMethod(0, g, dgdx, gxs);
+        final double rg = newtonsMethod(0, g, dgdx, gxs);
+        roots.put("rootg", nf.format(rg));
         final Table tableG = createTable(gxs, g, dgdx, "g");
 
         final File newtonDir = new File("newton");
         newtonDir.mkdir();
+        roots.write(new File(newtonDir, "roots.tex"));
         tableF.write(new File(newtonDir, "f.tex"));
         tableG.write(new File(newtonDir, "g.tex"));
 

@@ -28,6 +28,7 @@ import Jama.Matrix;
 
 import java.util.Arrays;
 import java.util.function.DoubleToIntFunction;
+import java.util.function.DoubleUnaryOperator;
 
 /**
  * A collection of utility functions for manipulating matrices that represent images.
@@ -41,8 +42,8 @@ public final class ImageMatrixUtils {
     /**
      * Maps doubles to bytes by truncating values outside the byte range.
      */
-    public static final DoubleToIntFunction TRUNCATING_MAP = d -> {
-        final int i = (int) Math.round(d);
+    public static final DoubleToIntFunction TRUNCATING_MAP = x -> {
+        final int i = (int) Math.round(x);
         if (i < 0)
             return 0;
         else if (i > 255)
@@ -55,15 +56,33 @@ public final class ImageMatrixUtils {
      * Represents a linear map from a given range to the byte range.
      */
     public static class LinearMap implements DoubleToIntFunction {
-        final double min;
-        final double max;
+        private final double a;
+        private final double b;
         public LinearMap(final double min, final double max) {
-            this.min = min;
-            this.max = max;
+            a = min;
+            b = max - min;
         }
         @Override
-        public int applyAsInt(final double d) {
-            return (int) Math.round(255 * (d - min) / (max - min));
+        public int applyAsInt(final double x) {
+            return (int) Math.round(255 * (x - a) / b);
+        }
+    }
+
+    /**
+     * Represents a logarithmic map from a given range to the byte range.
+     */
+    public static class LogarithmicMap implements DoubleToIntFunction {
+        private final double a;
+        private final double b;
+        private final DoubleUnaryOperator T;
+        public LogarithmicMap(final double min, final double max) {
+            T = x -> x - min + 1;
+            a = 255 / Math.log(T.applyAsDouble(max));
+            b = - a * Math.log(T.applyAsDouble(min));
+        }
+        @Override
+        public int applyAsInt(final double x) {
+            return (int) Math.round(a * Math.log(T.applyAsDouble(x)) + b);
         }
     }
 

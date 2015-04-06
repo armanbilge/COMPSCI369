@@ -5,6 +5,7 @@ desc 'Run all code and generate PDF report'
 task :default => 'doc/report.pdf'
 
 directory 'lib'
+CLEAN.include 'lib'
 
 file 'lib/Jama.jar' => 'lib' do |t|
   open(t.name, 'wb') do |f|
@@ -12,7 +13,6 @@ file 'lib/Jama.jar' => 'lib' do |t|
   end
 end
 
-desc 'Get all dependencies'
 task :depends => ['lib/Jama.jar']
 
 directory 'build'
@@ -43,6 +43,9 @@ desc 'Create problem 3 files'
 task :problem3 => [:compile, 'out'] do
   Dir.chdir('out') do
     sh 'java -cp "../build:../lib/*" nz.ac.auckland.cs369.assignment1.Problem3 ../data/snps.txt 100 2734'
+    Dir.chdir('PCA') do
+      sh 'Rscript ../../scripts/readandplot.R'
+    end
   end
 end
 
@@ -53,14 +56,15 @@ task :problem4 => [:compile, 'out'] do
   end
 end
 
-rule '.png' => '.pgm' do |t|
-  sh "convert #{t.source} #{t.name}"
+task :convert do
+  FileList.new('**/*.pgm').to_a.zip(FileList.new('**/*.pgm').ext('png')).each do |pgm, png|
+    sh "convert #{pgm} #{png}"
+  end
 end
 
-task :convert => FileList.new('**/*.pgm').ext('png')
-CLEAN.include '**/*.png'
+directory 'doc'
 
-file 'doc/report.pdf' => [:problem1, :problem2, :problem4, :convert] do |t|
+file 'doc/report.pdf' => [:problem1, :problem2, :problem3, :problem4, :convert, 'doc'] do |t|
   Dir.chdir('out') do
     sh "pandoc -V geometry:margin=2cm ../README.md -o ../#{t.name}"
   end

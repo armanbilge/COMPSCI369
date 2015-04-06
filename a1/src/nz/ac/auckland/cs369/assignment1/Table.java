@@ -93,7 +93,7 @@ public class Table {
 
     /**
      * Write the table as a LaTeX tabular environment.
-     * @param file the stream to write to
+     * @param file the file to write to
      * @throws IOException
      */
     public void write(final File file) throws IOException {

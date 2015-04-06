@@ -56,33 +56,13 @@ public class PrincipalComponentsAnalysis {
         if (rows > cols) {
             final SingularValueDecomposition SVD = B.svd();
             U = SVD.getV();
-            S = SVD.getS();
+            D = SVD.getS();
         } else {
             final SingularValueDecomposition SVD = B.transpose().svd();
-            S = SVD.getS();
-            U = SVD.getV().times(S);
+            U = SVD.getU();
+            D = SVD.getS();
         }
 
-        D = S.arrayTimes(S).times(1.0 / (rows));
-    }
-
-    /**
-     * Centers the rows of a matrix.
-     * @param A the matrix
-     * @return the centered matrix
-     */
-    private Matrix centerRows(final Matrix A) {
-        final Matrix B = A.copy();
-        final int rows = B.getRowDimension();
-        final int cols = B.getColumnDimension();
-        for (int i = 0; i < rows; ++i) {
-            final Matrix row = B.getMatrix(i, i, 0, cols - 1);
-            final double[][] mean = new double[1][cols];
-            Arrays.fill(mean[0], Arrays.stream(row.getRowPackedCopy()).sum() / cols);
-            row.minusEquals(new Matrix(mean));
-            B.setMatrix(i, i, 0, cols - 1, row);
-        }
-        return B;
     }
 
     /**
@@ -104,34 +84,49 @@ public class PrincipalComponentsAnalysis {
         return B;
     }
 
-    public double getPrincipalComponent(final int i) {
+    /**
+     * Get the ith largest singular value.
+     * @param i i
+     * @return the singular value
+     */
+    public double getSingularValue(final int i) {
         return D.get(i, i);
     }
 
-    public Matrix getPrincipalComponentVector(final int i) {
+    /**
+     * Get the principal component associated with the ith largest singular value.
+     * @param i i
+     * @return the principal component
+     */
+    public Matrix getPrincipalComponent(final int i) {
         return U.getMatrix(0, U.getRowDimension() - 1, i, i);
     }
 
-    public Matrix getProjectionMatrix(final int k) {
-        final Matrix U_k = U.getMatrix(0, U.getRowDimension() - 1, 0, k - 1);
-        return U_k.times(U_k.transpose());
+    /**
+     * Get the number of principal components.
+     * @return the number of principal components
+     */
+    public int getPrincipalComponentCount() {
+        return U.getColumnDimension();
     }
 
+    /**
+     * Get the projection matrix whose columns are the first k principal components.
+     * @param k k
+     * @return the projection matrix
+     */
+    private Matrix getProjectionMatrix(final int k) {
+        return U.getMatrix(0, U.getRowDimension() - 1, 0, k - 1);
+    }
+
+    /**
+     * Project the data into the k-dimensional space defined by the first k principal components.
+     * @param k k
+     * @return the projected data
+     */
     public Matrix getProjectedData(final int k) {
         final Matrix P_k = getProjectionMatrix(k);
-        return P_k.times(A).transpose();
-    }
-
-    public static void main(final String... args) {
-
-        final Matrix A = new Matrix(new double[][]{
-                {-4, 3, -5, 18, 6, -5},
-                {2, 6, -2, 10, 1, -1},
-                {7, 11, 3, 6, 9, 3}
-        });
-
-        final PrincipalComponentsAnalysis PCA = new PrincipalComponentsAnalysis(A.transpose());
-        final Matrix P = PCA.getProjectionMatrix(2);
+        return A.times(P_k);
     }
 
 }

@@ -91,6 +91,11 @@ public final class Problem2 {
         return Math.sqrt(Ex2 - Ex * Ex);
     }
 
+    /**
+     * Creates all necessary files for problem 2.
+     * @param args path to the input image
+     * @throws IOException
+     */
     public static void main(final String... args) throws IOException {
 
         final int[][] image = PGMIO.read(new File(args[0]));
