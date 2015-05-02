@@ -1,0 +1,13 @@
+((*- extends 'article.tplx' -*))
+
+((* block title *))
+\title{COMPSCI 369 Assignment 2}
+((* endblock title *))
+
+((* block author *))
+\author{Arman Bilge (\texttt{abil933}; 8079403)}
+((* endblock author *))
+
+((* block date *))
+\date{Thursday 14 May 2015}
+((* endblock date *))
