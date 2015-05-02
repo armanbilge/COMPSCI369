@@ -11,9 +11,3 @@ task :default => 'report.pdf'
 rule '.pdf' => '.ipynb' do |t|
   sh "ipython nbconvert  #{t.source} --ExecutePreprocessor.enabled=True --to pdf --template template.tplx"
 end
-
-# rule '.pdf' => '.tex' do |t|
-#   2.times do
-#     sh "pdflatex #{t.source}"
-#   end
-# end
