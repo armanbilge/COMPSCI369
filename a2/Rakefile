@@ -1,13 +1,10 @@
 require 'rake/clean'
 
-CLEAN.include '*.tex'
-CLEAN.include '*.aux'
-CLEAN.include '*.log'
-CLEAN.include '*.out'
 CLOBBER.include '*.pdf'
 
+desc 'Generate the report'
 task :default => 'report.pdf'
 
 rule '.pdf' => '.ipynb' do |t|
-  sh "ipython nbconvert  #{t.source} --ExecutePreprocessor.enabled=True --to pdf --template template.tplx"
+  sh "ipython nbconvert #{t.source} --ExecutePreprocessor.enabled=True --to pdf --template template.tplx"
 end
