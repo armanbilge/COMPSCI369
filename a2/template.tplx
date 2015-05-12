@@ -14,6 +14,7 @@
 
 ((* block commands *))
 \parindent=0pt
+\parskip=10pt
 \setcounter{secnumdepth}{0} % Turns off numbering for sections
 ((( super() )))
 ((* endblock commands *))
