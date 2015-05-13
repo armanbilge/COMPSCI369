@@ -13,6 +13,7 @@
 ((* endblock date *))
 
 ((* block commands *))
+\frenchspacing
 \parindent=0pt
 \parskip=10pt
 \setcounter{secnumdepth}{0} % Turns off numbering for sections
