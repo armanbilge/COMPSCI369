@@ -1,0 +1,21 @@
+((*- extends 'article.tplx' -*))
+
+((* block title *))
+\title{COMPSCI 369 Assignment 3}
+((* endblock title *))
+
+((* block author *))
+\author{Arman Bilge (\texttt{abil933}; 8079403)}
+((* endblock author *))
+
+((* block date *))
+\date{Friday 29 May 2015}
+((* endblock date *))
+
+((* block commands *))
+\frenchspacing
+\parindent=0pt
+\parskip=10pt
+\setcounter{secnumdepth}{0} % Turns off numbering for sections
+((( super() )))
+((* endblock commands *))
