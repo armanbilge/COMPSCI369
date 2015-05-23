@@ -2,7 +2,10 @@ require 'rake/clean'
 
 CLEAN.include '*.nbconvert.ipynb'
 CLEAN.include '*_files/'
-CLOBBER.include '*.pdf'
+CLEAN.include '*.csv'
+CLEAN.include '*.txt'
+CLEAN.include 'UPGMA*.pdf'
+CLOBBER.include 'report.pdf'
 
 desc 'Generate the report'
 task :default => 'report.pdf'
